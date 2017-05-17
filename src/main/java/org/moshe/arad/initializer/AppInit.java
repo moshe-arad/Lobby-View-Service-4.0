@@ -8,8 +8,10 @@ import java.util.concurrent.Executors;
 import org.moshe.arad.kafka.ConsumerToProducerQueue;
 import org.moshe.arad.kafka.KafkaUtils;
 import org.moshe.arad.kafka.consumers.ISimpleConsumer;
+import org.moshe.arad.kafka.consumers.config.GameRoomClosedEventConfig;
 import org.moshe.arad.kafka.consumers.config.NewGameRoomOpenedEventConfig;
 import org.moshe.arad.kafka.consumers.config.SimpleConsumerConfig;
+import org.moshe.arad.kafka.consumers.events.GameRoomClosedEventConsumer;
 import org.moshe.arad.kafka.consumers.events.NewGameRoomOpenedEventConsumer;
 import org.moshe.arad.kafka.events.NewGameRoomOpenedEventAck;
 import org.moshe.arad.kafka.producers.ISimpleProducer;
@@ -36,10 +38,10 @@ public class AppInit implements ApplicationContextAware, IAppInitializer {
 	@Autowired
 	private NewGameRoomOpenedEventConfig newGameRoomOpenedEventConfig;
 	
-	@Autowired
-	private SimpleEventsProducer<NewGameRoomOpenedEventAck> newGameRoomOpenedEventAckProducer;
+	private GameRoomClosedEventConsumer gameRoomClosedEventConsumer;
 	
-	private ConsumerToProducerQueue newGameRoomQueue = null;
+	@Autowired
+	private GameRoomClosedEventConfig GameRoomClosedEventConfig;
 	
 	public static final int NUM_CONSUMERS = 3;
 	
@@ -50,14 +52,15 @@ public class AppInit implements ApplicationContextAware, IAppInitializer {
 
 	@Override
 	public void initKafkaEventsConsumers() {
-		newGameRoomQueue = context.getBean(ConsumerToProducerQueue.class);
 		
 		for(int i=0; i<NUM_CONSUMERS; i++){
 			newGameRoomOpenedEventConsumer = context.getBean(NewGameRoomOpenedEventConsumer.class);			
+			gameRoomClosedEventConsumer = context.getBean(GameRoomClosedEventConsumer.class);
 			
-			initSingleConsumer(newGameRoomOpenedEventConsumer, KafkaUtils.NEW_GAME_ROOM_OPENED_EVENT_TOPIC, newGameRoomOpenedEventConfig, newGameRoomQueue);
+			initSingleConsumer(newGameRoomOpenedEventConsumer, KafkaUtils.NEW_GAME_ROOM_OPENED_EVENT_TOPIC, newGameRoomOpenedEventConfig, null);
 			
-			executeProducersAndConsumers(Arrays.asList(newGameRoomOpenedEventConsumer));
+			initSingleConsumer(gameRoomClosedEventConsumer, KafkaUtils.GAME_ROOM_CLOSED_EVENT_TOPIC, GameRoomClosedEventConfig, null);
+			executeProducersAndConsumers(Arrays.asList(newGameRoomOpenedEventConsumer, gameRoomClosedEventConsumer));
 		}
 	}
 
@@ -68,9 +71,7 @@ public class AppInit implements ApplicationContextAware, IAppInitializer {
 
 	@Override
 	public void initKafkaEventsProducers() {
-		initSingleProducer(newGameRoomOpenedEventAckProducer, KafkaUtils.NEW_GAME_ROOM_OPENED_EVENT_ACK_TOPIC, newGameRoomQueue);
-				
-		executeProducersAndConsumers(Arrays.asList(newGameRoomOpenedEventAckProducer));
+	
 	}
 
 	@Override

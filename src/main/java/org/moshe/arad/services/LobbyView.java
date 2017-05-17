@@ -17,6 +17,7 @@ public class LobbyView {
 	private RedisTemplate<String, String> redisTemplate;
 	
 	public static final String GAME_ROOMS = "GameRooms";
+	public static final String USERS_OPENED_BY = "UsersOpenedBy";
 	
 	private Logger logger = LoggerFactory.getLogger(LobbyView.class);
 	
@@ -36,5 +37,17 @@ public class LobbyView {
 		} catch (JsonProcessingException e) {			
 			e.printStackTrace();
 		}
+	}
+	
+	public void addOpenedByUser(GameRoom gameRoom, String username){
+		redisTemplate.opsForHash().put(USERS_OPENED_BY, username, gameRoom.getName());
+	}
+	
+	public void deleteGameRoom(GameRoom gameRoom){
+		redisTemplate.opsForHash().delete(GAME_ROOMS, gameRoom.getName());
+	}
+	
+	public void deleteOpenedByUser(GameRoom gameRoom, String username){
+		redisTemplate.opsForHash().delete(USERS_OPENED_BY, username);
 	}
 }

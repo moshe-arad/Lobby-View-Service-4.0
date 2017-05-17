@@ -37,5 +37,7 @@ public class KafkaUtils {
 	public static final String NEW_GAME_ROOM_OPENED_EVENT_GROUP = "NewGameRoomOpenedEventGroup";
 	public static final String NEW_GAME_ROOM_OPENED_EVENT_ACK_TOPIC = "New-Game-Room-Opened-Event-Ack";
 	public static final String NEW_GAME_ROOM_OPENED_EVENT_TOPIC = "New-Game-Room-Opened-Event";
+	public static final String GAME_ROOM_CLOSED_EVENT_GROUP = "GameRoomClosedEventGroup1";
+	public static final String GAME_ROOM_CLOSED_EVENT_TOPIC = "Game-Room-Closed-Event";
 	
 }

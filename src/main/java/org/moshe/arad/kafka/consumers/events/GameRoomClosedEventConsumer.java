@@ -4,6 +4,7 @@ import java.io.IOException;
 
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.moshe.arad.kafka.ConsumerToProducerQueue;
+import org.moshe.arad.kafka.events.GameRoomClosedEvent;
 import org.moshe.arad.kafka.events.NewGameRoomOpenedEvent;
 import org.moshe.arad.kafka.events.NewGameRoomOpenedEventAck;
 import org.moshe.arad.services.LobbyView;
@@ -18,7 +19,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Component
 @Scope("prototype")
-public class NewGameRoomOpenedEventConsumer extends SimpleEventsConsumer {
+public class GameRoomClosedEventConsumer extends SimpleEventsConsumer {
 
 	@Autowired
 	private LobbyView lobbyView;
@@ -28,19 +29,19 @@ public class NewGameRoomOpenedEventConsumer extends SimpleEventsConsumer {
 	
 	private ConsumerToProducerQueue consumerToProducerQueue;
 	
-	Logger logger = LoggerFactory.getLogger(NewGameRoomOpenedEventConsumer.class);
+	Logger logger = LoggerFactory.getLogger(GameRoomClosedEventConsumer.class);
 	
-	public NewGameRoomOpenedEventConsumer() {
+	public GameRoomClosedEventConsumer() {
 	}
 	
 	@Override
 	public void consumerOperations(ConsumerRecord<String, String> record) {
-		NewGameRoomOpenedEvent newGameRoomOpenedEvent = convertJsonBlobIntoEvent(record.value());
+		GameRoomClosedEvent gameRoomClosedEvent = convertJsonBlobIntoEvent(record.value());
 		
 		try{
 			logger.info("Will add game room...");
-			lobbyView.addGameRoom(newGameRoomOpenedEvent.getGameRoom());
-			lobbyView.addOpenedByUser(newGameRoomOpenedEvent.getGameRoom(), newGameRoomOpenedEvent.getGameRoom().getOpenBy());
+			lobbyView.deleteGameRoom(gameRoomClosedEvent.getGameRoom());
+			lobbyView.deleteOpenedByUser(gameRoomClosedEvent.getGameRoom(), gameRoomClosedEvent.getGameRoom().getOpenBy());
 			logger.info("Game room added to view");
 		}
 		catch(Exception e){
@@ -50,10 +51,10 @@ public class NewGameRoomOpenedEventConsumer extends SimpleEventsConsumer {
 		}
 	}
 	
-	private NewGameRoomOpenedEvent convertJsonBlobIntoEvent(String JsonBlob){
+	private GameRoomClosedEvent convertJsonBlobIntoEvent(String JsonBlob){
 		ObjectMapper objectMapper = new ObjectMapper();
 		try {
-			return objectMapper.readValue(JsonBlob, NewGameRoomOpenedEvent.class);
+			return objectMapper.readValue(JsonBlob, GameRoomClosedEvent.class);
 		} catch (IOException e) {
 			logger.error("Falied to convert Json blob into Event...");
 			logger.error(e.getMessage());
