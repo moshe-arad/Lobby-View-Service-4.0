@@ -37,26 +37,16 @@ public class NewGameRoomOpenedEventConsumer extends SimpleEventsConsumer {
 	public void consumerOperations(ConsumerRecord<String, String> record) {
 		NewGameRoomOpenedEvent newGameRoomOpenedEvent = convertJsonBlobIntoEvent(record.value());
 		
-		NewGameRoomOpenedEventAck newGameRoomOpenedEventAck = context.getBean(NewGameRoomOpenedEventAck.class);
-		newGameRoomOpenedEventAck.setUuid(newGameRoomOpenedEvent.getUuid());
-		newGameRoomOpenedEventAck.setGameRoom(newGameRoomOpenedEvent.getGameRoom());
-		
 		try{
 			logger.info("Will add game room...");
 			lobbyView.addGameRoom(newGameRoomOpenedEvent.getGameRoom());
 			logger.info("Game room added to view");
-			newGameRoomOpenedEventAck.setGameRoomOpened(true);
 		}
 		catch(Exception e){
 			logger.error("Failed to add new game room to view...");
 			logger.error(e.getMessage());
 			e.printStackTrace();
-			newGameRoomOpenedEventAck.setGameRoomOpened(false);
 		}
-				
-		logger.info("Will reply with ack event...");
-		consumerToProducerQueue.getEventsQueue().put(newGameRoomOpenedEventAck);
-		logger.info("Ack event passed...");
 	}
 	
 	private NewGameRoomOpenedEvent convertJsonBlobIntoEvent(String JsonBlob){
