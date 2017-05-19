@@ -8,14 +8,16 @@ import java.util.concurrent.Executors;
 import org.moshe.arad.kafka.ConsumerToProducerQueue;
 import org.moshe.arad.kafka.KafkaUtils;
 import org.moshe.arad.kafka.consumers.ISimpleConsumer;
+import org.moshe.arad.kafka.consumers.command.GetAllGameRoomsCommandConsumer;
 import org.moshe.arad.kafka.consumers.config.GameRoomClosedEventConfig;
+import org.moshe.arad.kafka.consumers.config.GetAllGameRoomsCommandConfig;
 import org.moshe.arad.kafka.consumers.config.NewGameRoomOpenedEventConfig;
 import org.moshe.arad.kafka.consumers.config.SimpleConsumerConfig;
 import org.moshe.arad.kafka.consumers.config.UserAddedAsWatcherEventConfig;
 import org.moshe.arad.kafka.consumers.events.GameRoomClosedEventConsumer;
 import org.moshe.arad.kafka.consumers.events.NewGameRoomOpenedEventConsumer;
 import org.moshe.arad.kafka.consumers.events.UserAddedAsWatcherEventConsumer;
-import org.moshe.arad.kafka.events.NewGameRoomOpenedEventAck;
+import org.moshe.arad.kafka.events.GetAllGameRoomsAckEvent;
 import org.moshe.arad.kafka.producers.ISimpleProducer;
 import org.moshe.arad.kafka.producers.events.SimpleEventsProducer;
 import org.slf4j.Logger;
@@ -50,11 +52,34 @@ public class AppInit implements ApplicationContextAware, IAppInitializer {
 	@Autowired
 	private UserAddedAsWatcherEventConfig userAddedAsWatcherEventConfig;
 	
+	private GetAllGameRoomsCommandConsumer getAllGameRoomsCommandConsumer;
+	
+	@Autowired
+	private GetAllGameRoomsCommandConfig getAllGameRoomsCommandConfig;
+	
+	@Autowired
+	private SimpleEventsProducer<GetAllGameRoomsAckEvent> getAllGameRoomsAckEventProducer;
+	
+	private ConsumerToProducerQueue getAllGameRoomsQueue;
+	
 	public static final int NUM_CONSUMERS = 3;
 	
 	@Override
 	public void initKafkaCommandsConsumers() {
+		
+		
+		getAllGameRoomsQueue = context.getBean(ConsumerToProducerQueue.class);
+		
+		for(int i=0; i<NUM_CONSUMERS; i++){
+			getAllGameRoomsCommandConsumer = context.getBean(GetAllGameRoomsCommandConsumer.class);
+			
+			logger.info("Initializing new user created event consumer...");
+			initSingleConsumer(getAllGameRoomsCommandConsumer, KafkaUtils.GET_ALL_GAME_ROOMS_COMMAND_TOPIC, getAllGameRoomsCommandConfig, getAllGameRoomsQueue);
+			logger.info("Initialize new user created event, completed...");
+		
 
+			executeProducersAndConsumers(Arrays.asList(getAllGameRoomsCommandConsumer));
+		}
 	}
 
 	@Override
@@ -84,7 +109,9 @@ public class AppInit implements ApplicationContextAware, IAppInitializer {
 
 	@Override
 	public void initKafkaEventsProducers() {
-	
+		initSingleProducer(getAllGameRoomsAckEventProducer, KafkaUtils.GET_ALL_GAME_ROOMS_EVENT_ACK_TOPIC, getAllGameRoomsQueue);
+		
+		executeProducersAndConsumers(Arrays.asList(getAllGameRoomsAckEventProducer));	
 	}
 
 	@Override

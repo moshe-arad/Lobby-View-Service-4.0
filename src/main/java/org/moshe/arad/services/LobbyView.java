@@ -1,5 +1,10 @@
 package org.moshe.arad.services;
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.ListIterator;
+
 import org.moshe.arad.entities.GameRoom;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -54,5 +59,21 @@ public class LobbyView {
 	
 	public void addUserAsWatcher(String username, String gameRoomName){
 		redisTemplate.opsForHash().put(USERS_WATCHERS, username, gameRoomName);
+	}
+
+	public List<GameRoom> getAllGameRooms() {
+		List<GameRoom> result = new ArrayList<>(100000);
+		List<Object> temp = redisTemplate.opsForHash().values(GAME_ROOMS);
+		ObjectMapper objectMapper = new ObjectMapper();
+		ListIterator<Object> it = temp.listIterator();
+		while(it.hasNext()){
+			String jsonRoom = it.next().toString();
+			try {
+				result.add(objectMapper.readValue(jsonRoom, GameRoom.class));
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+		return result;
 	}
 }
