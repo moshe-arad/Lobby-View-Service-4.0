@@ -18,6 +18,7 @@ public class LobbyView {
 	
 	public static final String GAME_ROOMS = "GameRooms";
 	public static final String USERS_OPENED_BY = "UsersOpenedBy";
+	public static final String USERS_WATCHERS = "UsersWatchers";
 	
 	private Logger logger = LoggerFactory.getLogger(LobbyView.class);
 	
@@ -49,5 +50,9 @@ public class LobbyView {
 	
 	public void deleteOpenedByUser(GameRoom gameRoom, String username){
 		redisTemplate.opsForHash().delete(USERS_OPENED_BY, username);
+	}
+	
+	public void addUserAsWatcher(String username, String gameRoomName){
+		redisTemplate.opsForHash().put(USERS_WATCHERS, username, gameRoomName);
 	}
 }

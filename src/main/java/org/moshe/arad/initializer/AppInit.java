@@ -11,8 +11,10 @@ import org.moshe.arad.kafka.consumers.ISimpleConsumer;
 import org.moshe.arad.kafka.consumers.config.GameRoomClosedEventConfig;
 import org.moshe.arad.kafka.consumers.config.NewGameRoomOpenedEventConfig;
 import org.moshe.arad.kafka.consumers.config.SimpleConsumerConfig;
+import org.moshe.arad.kafka.consumers.config.UserAddedAsWatcherEventConfig;
 import org.moshe.arad.kafka.consumers.events.GameRoomClosedEventConsumer;
 import org.moshe.arad.kafka.consumers.events.NewGameRoomOpenedEventConsumer;
+import org.moshe.arad.kafka.consumers.events.UserAddedAsWatcherEventConsumer;
 import org.moshe.arad.kafka.events.NewGameRoomOpenedEventAck;
 import org.moshe.arad.kafka.producers.ISimpleProducer;
 import org.moshe.arad.kafka.producers.events.SimpleEventsProducer;
@@ -43,6 +45,11 @@ public class AppInit implements ApplicationContextAware, IAppInitializer {
 	@Autowired
 	private GameRoomClosedEventConfig GameRoomClosedEventConfig;
 	
+	private UserAddedAsWatcherEventConsumer userAddedAsWatcherEventConsumer;
+	
+	@Autowired
+	private UserAddedAsWatcherEventConfig userAddedAsWatcherEventConfig;
+	
 	public static final int NUM_CONSUMERS = 3;
 	
 	@Override
@@ -56,11 +63,17 @@ public class AppInit implements ApplicationContextAware, IAppInitializer {
 		for(int i=0; i<NUM_CONSUMERS; i++){
 			newGameRoomOpenedEventConsumer = context.getBean(NewGameRoomOpenedEventConsumer.class);			
 			gameRoomClosedEventConsumer = context.getBean(GameRoomClosedEventConsumer.class);
+			userAddedAsWatcherEventConsumer = context.getBean(UserAddedAsWatcherEventConsumer.class);
 			
 			initSingleConsumer(newGameRoomOpenedEventConsumer, KafkaUtils.NEW_GAME_ROOM_OPENED_EVENT_TOPIC, newGameRoomOpenedEventConfig, null);
 			
 			initSingleConsumer(gameRoomClosedEventConsumer, KafkaUtils.GAME_ROOM_CLOSED_EVENT_TOPIC, GameRoomClosedEventConfig, null);
-			executeProducersAndConsumers(Arrays.asList(newGameRoomOpenedEventConsumer, gameRoomClosedEventConsumer));
+			
+			initSingleConsumer(userAddedAsWatcherEventConsumer, KafkaUtils.USER_ADDED_AS_WATCHER_EVENT_TOPIC, userAddedAsWatcherEventConfig, null);
+			
+			executeProducersAndConsumers(Arrays.asList(newGameRoomOpenedEventConsumer, 
+					gameRoomClosedEventConsumer,
+					userAddedAsWatcherEventConsumer));
 		}
 	}
 

@@ -39,5 +39,7 @@ public class KafkaUtils {
 	public static final String NEW_GAME_ROOM_OPENED_EVENT_TOPIC = "New-Game-Room-Opened-Event";
 	public static final String GAME_ROOM_CLOSED_EVENT_GROUP = "GameRoomClosedEventGroup1";
 	public static final String GAME_ROOM_CLOSED_EVENT_TOPIC = "Game-Room-Closed-Event";
+	public static final Object USER_ADDED_AS_WATCHER_EVENT_GROUP = "UserAddedAsWatcherEventGroup1";
+	public static final String USER_ADDED_AS_WATCHER_EVENT_TOPIC = "User-Added-As-Watcher-Event";
 	
 }
