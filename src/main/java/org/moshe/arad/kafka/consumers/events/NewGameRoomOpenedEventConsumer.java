@@ -38,6 +38,7 @@ public class NewGameRoomOpenedEventConsumer extends SimpleEventsConsumer {
 		NewGameRoomOpenedEvent newGameRoomOpenedEvent = convertJsonBlobIntoEvent(record.value());
 		
 		try{
+			lobbyView.markGameRoomOpenedUpdateView(newGameRoomOpenedEvent.getGameRoom());
 			logger.info("Will add game room...");
 			lobbyView.addGameRoom(newGameRoomOpenedEvent.getGameRoom());
 			lobbyView.addOpenedByUser(newGameRoomOpenedEvent.getGameRoom(), newGameRoomOpenedEvent.getGameRoom().getOpenBy());

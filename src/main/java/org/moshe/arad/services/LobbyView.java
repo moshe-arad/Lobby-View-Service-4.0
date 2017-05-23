@@ -39,6 +39,7 @@ public class LobbyView implements Callable<Set<String>>{
 	public static final String NEED_TO_UPDATE = "NeedToUpdate";
 	public static final String DELETE_WATCHER = "DeleteWatcher";
 	public static final String DELETE_GAME_ROOM = "DeleteGameRoom";
+	public static final String ADD_GAME_ROOM = "AddGameRoom";
 	
 	private ThreadPoolExecutor executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(4);
 	
@@ -102,6 +103,17 @@ public class LobbyView implements Callable<Set<String>>{
 		redisTemplate.opsForHash().put(NEED_TO_UPDATE + ":" + DELETE_GAME_ROOM, gameRoomName, gameRoomName);
 	}
 	
+	public void markGameRoomOpenedUpdateView(GameRoom gameRoom){
+		ObjectMapper objectMapper = new ObjectMapper();
+		String gameRoomJson = null;
+		try {
+			gameRoomJson = objectMapper.writeValueAsString(gameRoom);
+		} catch (JsonProcessingException e) {
+			e.printStackTrace();
+		}
+		redisTemplate.opsForHash().put(NEED_TO_UPDATE + ":" + ADD_GAME_ROOM, gameRoom.getName(), gameRoomJson);
+	}
+	
 	public void deleteWatcherFromGameRoom(String watcher){
 		String gameRoomName = (String) redisTemplate.opsForHash().get(USERS_WATCHERS, watcher);
 		redisTemplate.opsForHash().delete(USERS_WATCHERS, watcher);
@@ -119,7 +131,9 @@ public class LobbyView implements Callable<Set<String>>{
 	
 	public GetLobbyUpdateViewAckEvent getNeedToUpdate(){
 		GetLobbyUpdateViewAckEvent result = context.getBean(GetLobbyUpdateViewAckEvent.class);
-		Future<Set<String>> keysFuture = executor.submit(this);
+		UpdateViewJob updateViewJob = context.getBean(UpdateViewJob.class);
+		
+		Future<Set<String>> keysFuture = executor.submit(updateViewJob);
 		Set<String> keys = null;
 		try {
 			keys = keysFuture.get();
@@ -140,6 +154,20 @@ public class LobbyView implements Callable<Set<String>>{
 				redisTemplate.opsForHash().entries(NEED_TO_UPDATE + ":" + DELETE_GAME_ROOM).keySet().stream()
 				.forEach((Object itemKey) -> {result.getGameRoomsDelete().add(itemKey.toString());});
 				redisTemplate.delete(NEED_TO_UPDATE + ":" + DELETE_GAME_ROOM);
+			}
+			else if(key.equals(NEED_TO_UPDATE + ":" + ADD_GAME_ROOM)){
+				redisTemplate.opsForHash().entries(NEED_TO_UPDATE + ":" + ADD_GAME_ROOM).values().stream()
+				.forEach((Object room) -> {
+					ObjectMapper objectMapper = new ObjectMapper();
+					GameRoom gameRoom = null;
+					try {
+						gameRoom = objectMapper.readValue(room.toString(), GameRoom.class);
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
+					result.getGameRoomsAdd().add(gameRoom);
+					});
+				redisTemplate.delete(NEED_TO_UPDATE + ":" + ADD_GAME_ROOM);
 			}
 		}
 		
