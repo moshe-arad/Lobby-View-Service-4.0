@@ -44,5 +44,11 @@ public class KafkaUtils {
 	public static final String GET_ALL_GAME_ROOMS_COMMAND_GROUP = "GetAllGamesRoomsCommandGroup";
 	public static final String GET_ALL_GAME_ROOMS_COMMAND_TOPIC = "Get-All-Game-Rooms-Command";
 	public static final String GET_ALL_GAME_ROOMS_EVENT_ACK_TOPIC = "Get-All-Game-Rooms-Event-Ack";
-	
+	public static final String GAME_ROOM_CLOSED_EVENT_LOGOUT_GROUP = "GameRoomClosedEventLogoutGroup2";
+	public static final String GAME_ROOM_CLOSED_EVENT_LOGOUT_TOPIC = "Game-Room-Closed-Event-Logout";
+	public static final String WATCHER_REMOVED_EVENT_GROUP = "WatcherRemovedEventGroup2";
+	public static final String WATCHER_REMOVED_EVENT_TOPIC = "Watcher-Removed-Event";
+	public static final String GET_LOBBY_UPDATE_VIEW_COMMAND_GROUP = "GetLobbyUpdateViewCommandGroup";
+	public static final String GET_LOBBY_UPDATE_VIEW_COMMAND_TOPIC = "Get-Lobby-Update-View-Command";
+	public static final String GET_LOBBY_UPDATE_VIEW_ACK_EVENT_TOPIC = "Get-Lobby-Update-View-Ack-Event";
 }
