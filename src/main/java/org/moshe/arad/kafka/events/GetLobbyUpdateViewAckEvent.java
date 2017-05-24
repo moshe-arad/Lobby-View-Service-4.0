@@ -19,6 +19,7 @@ public class GetLobbyUpdateViewAckEvent extends BackgammonEvent{
 	private List<String> gameRoomsDelete = new ArrayList<>(10000);
 	private Map<Object,Object> addWatchers = new HashMap<>(10000);
 	private Map<Object,Object> deleteWatchers = new HashMap<>(10000);
+	private Map<String,List<GameRoom>> gameRoomsAddPerUser = new HashMap<>(10000); 
 	
 	public GetLobbyUpdateViewAckEvent() {
 	
@@ -79,5 +80,13 @@ public class GetLobbyUpdateViewAckEvent extends BackgammonEvent{
 
 	public void setDeleteWatchers(Map<Object, Object> deleteWatchers) {
 		this.deleteWatchers = deleteWatchers;
+	}
+
+	public Map<String, List<GameRoom>> getGameRoomsAddPerUser() {
+		return gameRoomsAddPerUser;
+	}
+
+	public void setGameRoomsAddPerUser(Map<String, List<GameRoom>> gameRoomsAddPerUser) {
+		this.gameRoomsAddPerUser = gameRoomsAddPerUser;
 	}
 }

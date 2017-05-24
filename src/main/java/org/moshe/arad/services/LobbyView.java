@@ -11,6 +11,8 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.ThreadPoolExecutor;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import org.moshe.arad.entities.GameRoom;
 import org.moshe.arad.kafka.events.GetLobbyUpdateViewAckEvent;
@@ -79,6 +81,7 @@ public class LobbyView implements Callable<Set<String>>{
 		redisTemplate.opsForHash().put(USERS_WATCHERS, username, gameRoomName);
 	}
 
+	@Deprecated
 	public List<GameRoom> getAllGameRooms() {
 		List<GameRoom> result = new ArrayList<>(100000);
 		List<Object> temp = redisTemplate.opsForHash().values(GAME_ROOMS);
@@ -168,7 +171,28 @@ public class LobbyView implements Callable<Set<String>>{
 					result.getGameRoomsAdd().add(gameRoom);
 					});
 				redisTemplate.delete(NEED_TO_UPDATE + ":" + ADD_GAME_ROOM);
+			}			
+		}
+		
+		return result;
+	}
+	
+	public GetLobbyUpdateViewAckEvent getNeedToUpdate(String username){
+		GetLobbyUpdateViewAckEvent result = context.getBean(GetLobbyUpdateViewAckEvent.class);
+		
+		if(username != null){ 
+			List<Object> roomsObj = new ArrayList<>(redisTemplate.opsForHash().entries(GAME_ROOMS).values());
+			List<GameRoom> rooms = roomsObj.stream().map(item -> {
+			ObjectMapper ObjectMapper = new ObjectMapper();
+			GameRoom room = null;
+			try {
+				room = ObjectMapper.readValue(item.toString(), GameRoom.class);
+			} catch (IOException e) {
+				e.printStackTrace();
 			}
+			return room;
+			}).collect(Collectors.toList());
+			result.getGameRoomsAddPerUser().put(username, rooms);
 		}
 		
 		return result;

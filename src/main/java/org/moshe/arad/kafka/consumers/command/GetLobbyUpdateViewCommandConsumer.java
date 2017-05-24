@@ -41,7 +41,12 @@ public class GetLobbyUpdateViewCommandConsumer extends SimpleCommandsConsumer {
 		GetLobbyUpdateViewCommand getLobbyUpdateViewCommand = convertJsonBlobIntoEvent(record.value());
 		logger.info("Get Lobby Update View Command record recieved, " + record.value());
 		
-		GetLobbyUpdateViewAckEvent getLobbyUpdateViewAckEvent = lobbyView.getNeedToUpdate();
+		String username = getLobbyUpdateViewCommand.getUsername();
+		GetLobbyUpdateViewAckEvent getLobbyUpdateViewAckEvent = null;
+		
+		if(username != null) getLobbyUpdateViewAckEvent = lobbyView.getNeedToUpdate(username);
+		else getLobbyUpdateViewAckEvent = lobbyView.getNeedToUpdate();
+		
 		getLobbyUpdateViewAckEvent.setUuid(getLobbyUpdateViewCommand.getUuid());
 		
     	logger.info("passing get Lobby Update View Ack Event to producer...");
