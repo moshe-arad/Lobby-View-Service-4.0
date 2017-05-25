@@ -42,6 +42,7 @@ public class LobbyView implements Callable<Set<String>>{
 	public static final String DELETE_WATCHER = "DeleteWatcher";
 	public static final String DELETE_GAME_ROOM = "DeleteGameRoom";
 	public static final String ADD_GAME_ROOM = "AddGameRoom";
+	public static final String ADD_WATCHER = "AddWatcher";
 	
 	private ThreadPoolExecutor executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(4);
 	
@@ -100,6 +101,10 @@ public class LobbyView implements Callable<Set<String>>{
 	
 	public void markWatcherRemoveUpdateView(String gameRoomName, String watcher){
 		redisTemplate.opsForHash().put(NEED_TO_UPDATE + ":" + DELETE_WATCHER, gameRoomName, watcher);
+	}
+	
+	public void markWatcherAddUpdateView(String gameRoomName, String watcher){
+		redisTemplate.opsForHash().put(NEED_TO_UPDATE + ":" + ADD_WATCHER, gameRoomName, watcher);
 	}
 	
 	public void markGameRoomClosedUpdateView(String gameRoomName){
@@ -171,7 +176,12 @@ public class LobbyView implements Callable<Set<String>>{
 					result.getGameRoomsAdd().add(gameRoom);
 					});
 				redisTemplate.delete(NEED_TO_UPDATE + ":" + ADD_GAME_ROOM);
-			}			
+			}
+			else if(key.equals(NEED_TO_UPDATE + ":" + ADD_WATCHER)){
+				result.setAddWatchers(redisTemplate.opsForHash().entries(NEED_TO_UPDATE + ":" + ADD_WATCHER));
+				redisTemplate.delete(NEED_TO_UPDATE + ":" + ADD_WATCHER);
+			}
+			
 		}
 		
 		return result;

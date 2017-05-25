@@ -40,11 +40,11 @@ public class WatcherRemovedEventConsumer extends SimpleEventsConsumer {
 		WatcherRemovedEvent watcherRemovedEvent = convertJsonBlobIntoEvent(record.value());
 		
 		try{
-			logger.info("Will mark view update...");
-			lobbyView.markWatcherRemoveUpdateView(watcherRemovedEvent.getGameRoom().getName(), watcherRemovedEvent.getRemovedWatcher());
 			logger.info("Will delete watcher from game room...");
 			lobbyView.deleteWatcherFromGameRoom(watcherRemovedEvent.getRemovedWatcher());
 			logger.info("Watcher deleted to view");
+			logger.info("Will mark view update...");
+			lobbyView.markWatcherRemoveUpdateView(watcherRemovedEvent.getGameRoom().getName(), watcherRemovedEvent.getRemovedWatcher());
 		}
 		catch(Exception e){
 			logger.error("Failed to add new game room to view...");

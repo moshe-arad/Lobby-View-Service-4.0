@@ -39,10 +39,11 @@ public class UserAddedAsWatcherEventConsumer extends SimpleEventsConsumer {
 	public void consumerOperations(ConsumerRecord<String, String> record) {
 		UserAddedAsWatcherEvent userAddedAsWatcherEvent = convertJsonBlobIntoEvent(record.value());
 		
-		try{
+		try{			
 			logger.info("Will add game room...");
 			lobbyView.addGameRoom(userAddedAsWatcherEvent.getGameRoom());
 			lobbyView.addUserAsWatcher(userAddedAsWatcherEvent.getUsername(), userAddedAsWatcherEvent.getGameRoom().getName());
+			lobbyView.markWatcherAddUpdateView(userAddedAsWatcherEvent.getGameRoom().getName(), userAddedAsWatcherEvent.getUsername());
 			logger.info("Game room added to view");
 		}
 		catch(Exception e){

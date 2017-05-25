@@ -38,13 +38,13 @@ public class GameRoomClosedEventLogoutConsumer extends SimpleEventsConsumer {
 	public void consumerOperations(ConsumerRecord<String, String> record) {
 		GameRoomClosedEvent gameRoomClosedEvent = convertJsonBlobIntoEvent(record.value());
 		
-		try{
-			logger.info("Will mark view update...");
-			lobbyView.markGameRoomClosedUpdateView(gameRoomClosedEvent.getGameRoom().getName());
+		try{			
 			logger.info("Will delete game room...");
 			lobbyView.deleteGameRoom(gameRoomClosedEvent.getGameRoom());
 			lobbyView.deleteOpenedByUser(gameRoomClosedEvent.getGameRoom(), gameRoomClosedEvent.getGameRoom().getOpenBy());
 			logger.info("Game room deleted to view");
+			logger.info("Will mark view update...");
+			lobbyView.markGameRoomClosedUpdateView(gameRoomClosedEvent.getGameRoom().getName());
 		}
 		catch(Exception e){
 			logger.error("Failed to add new game room to view...");
