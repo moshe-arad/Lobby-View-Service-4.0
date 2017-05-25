@@ -37,12 +37,14 @@ public class LobbyView implements Callable<Set<String>>{
 	
 	public static final String GAME_ROOMS = "GameRooms";
 	public static final String USERS_OPENED_BY = "UsersOpenedBy";
+	public static final String USERS_SECOND_PLAYER = "UsersSecondPlayer";
 	public static final String USERS_WATCHERS = "UsersWatchers";
 	public static final String NEED_TO_UPDATE = "NeedToUpdate";
 	public static final String DELETE_WATCHER = "DeleteWatcher";
 	public static final String DELETE_GAME_ROOM = "DeleteGameRoom";
 	public static final String ADD_GAME_ROOM = "AddGameRoom";
 	public static final String ADD_WATCHER = "AddWatcher";
+	public static final String ADD_SECOND_PLAYER = "AddSecondPlayer";
 	
 	private ThreadPoolExecutor executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(4);
 	
@@ -81,6 +83,10 @@ public class LobbyView implements Callable<Set<String>>{
 	public void addUserAsWatcher(String username, String gameRoomName){
 		redisTemplate.opsForHash().put(USERS_WATCHERS, username, gameRoomName);
 	}
+	
+	public void addUserAsSecondPlayer(String username, String gameRoomName){
+		redisTemplate.opsForHash().put(USERS_SECOND_PLAYER, username, gameRoomName);
+	}
 
 	@Deprecated
 	public List<GameRoom> getAllGameRooms() {
@@ -105,6 +111,10 @@ public class LobbyView implements Callable<Set<String>>{
 	
 	public void markWatcherAddUpdateView(String gameRoomName, String watcher){
 		redisTemplate.opsForHash().put(NEED_TO_UPDATE + ":" + ADD_WATCHER, gameRoomName, watcher);
+	}
+	
+	public void markSecondPlayerAddUpdateView(String gameRoomName, String second){
+		redisTemplate.opsForHash().put(NEED_TO_UPDATE + ":" + ADD_SECOND_PLAYER, gameRoomName, second);
 	}
 	
 	public void markGameRoomClosedUpdateView(String gameRoomName){
@@ -180,6 +190,10 @@ public class LobbyView implements Callable<Set<String>>{
 			else if(key.equals(NEED_TO_UPDATE + ":" + ADD_WATCHER)){
 				result.setAddWatchers(redisTemplate.opsForHash().entries(NEED_TO_UPDATE + ":" + ADD_WATCHER));
 				redisTemplate.delete(NEED_TO_UPDATE + ":" + ADD_WATCHER);
+			}
+			else if(key.equals(NEED_TO_UPDATE + ":" + ADD_SECOND_PLAYER)){
+				result.setAddSecondPlayer(redisTemplate.opsForHash().entries(NEED_TO_UPDATE + ":" + ADD_SECOND_PLAYER));
+				redisTemplate.delete(NEED_TO_UPDATE + ":" + ADD_SECOND_PLAYER);
 			}
 			
 		}

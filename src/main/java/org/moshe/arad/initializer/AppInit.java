@@ -15,15 +15,18 @@ import org.moshe.arad.kafka.consumers.config.GetAllGameRoomsCommandConfig;
 import org.moshe.arad.kafka.consumers.config.GetLobbyUpdateViewCommandConfig;
 import org.moshe.arad.kafka.consumers.config.NewGameRoomOpenedEventConfig;
 import org.moshe.arad.kafka.consumers.config.SimpleConsumerConfig;
+import org.moshe.arad.kafka.consumers.config.UserAddedAsSecondPlayerEventConfig;
 import org.moshe.arad.kafka.consumers.config.UserAddedAsWatcherEventConfig;
 import org.moshe.arad.kafka.consumers.config.WatcherRemovedEventConfig;
 import org.moshe.arad.kafka.consumers.events.GameRoomClosedEventConsumer;
 import org.moshe.arad.kafka.consumers.events.GameRoomClosedEventLogoutConsumer;
 import org.moshe.arad.kafka.consumers.events.NewGameRoomOpenedEventConsumer;
+import org.moshe.arad.kafka.consumers.events.UserAddedAsSecondPlayerEventConsumer;
 import org.moshe.arad.kafka.consumers.events.UserAddedAsWatcherEventConsumer;
 import org.moshe.arad.kafka.consumers.events.WatcherRemovedEventConsumer;
 import org.moshe.arad.kafka.events.GetAllGameRoomsAckEvent;
 import org.moshe.arad.kafka.events.GetLobbyUpdateViewAckEvent;
+import org.moshe.arad.kafka.events.InitGameRoomCompletedEvent;
 import org.moshe.arad.kafka.producers.ISimpleProducer;
 import org.moshe.arad.kafka.producers.events.SimpleEventsProducer;
 import org.slf4j.Logger;
@@ -86,6 +89,16 @@ public class AppInit implements ApplicationContextAware, IAppInitializer {
 	@Autowired
 	private SimpleEventsProducer<GetLobbyUpdateViewAckEvent> getLobbyUpdateViewAckEventProducer;
 	
+	private UserAddedAsSecondPlayerEventConsumer userAddedAsSecondPlayerEventConsumer;
+	
+	@Autowired
+	private UserAddedAsSecondPlayerEventConfig userAddedAsSecondPlayerEventConfig;
+	
+	private ConsumerToProducerQueue initGameRoomCompletedQueue;
+	
+	@Autowired
+	private SimpleEventsProducer<InitGameRoomCompletedEvent> initGameRoomCompletedEventProducer;
+	
 	public static final int NUM_CONSUMERS = 3;
 	
 	@Override
@@ -106,12 +119,15 @@ public class AppInit implements ApplicationContextAware, IAppInitializer {
 	@Override
 	public void initKafkaEventsConsumers() {
 		
+		initGameRoomCompletedQueue = context.getBean(ConsumerToProducerQueue.class);
+		
 		for(int i=0; i<NUM_CONSUMERS; i++){
 			newGameRoomOpenedEventConsumer = context.getBean(NewGameRoomOpenedEventConsumer.class);			
 			gameRoomClosedEventConsumer = context.getBean(GameRoomClosedEventConsumer.class);
 			userAddedAsWatcherEventConsumer = context.getBean(UserAddedAsWatcherEventConsumer.class);
 			gameRoomClosedEventLogoutConsumer = context.getBean(GameRoomClosedEventLogoutConsumer.class);
 			watcherRemovedEventConsumer = context.getBean(WatcherRemovedEventConsumer.class);
+			userAddedAsSecondPlayerEventConsumer = context.getBean(UserAddedAsSecondPlayerEventConsumer.class);
 			
 			initSingleConsumer(newGameRoomOpenedEventConsumer, KafkaUtils.NEW_GAME_ROOM_OPENED_EVENT_TOPIC, newGameRoomOpenedEventConfig, null);
 			
@@ -123,11 +139,14 @@ public class AppInit implements ApplicationContextAware, IAppInitializer {
 			
 			initSingleConsumer(watcherRemovedEventConsumer, KafkaUtils.WATCHER_REMOVED_EVENT_TOPIC, watcherRemovedEventConfig, null);
 			
+			initSingleConsumer(userAddedAsSecondPlayerEventConsumer, KafkaUtils.USER_ADDED_AS_SECOND_PLAYER_EVENT_TOPIC, userAddedAsSecondPlayerEventConfig, initGameRoomCompletedQueue);
+			
 			executeProducersAndConsumers(Arrays.asList(newGameRoomOpenedEventConsumer, 
 					gameRoomClosedEventConsumer,
 					userAddedAsWatcherEventConsumer,
 					gameRoomClosedEventLogoutConsumer,
-					watcherRemovedEventConsumer));
+					watcherRemovedEventConsumer,
+					userAddedAsSecondPlayerEventConsumer));
 		}
 	}
 
@@ -142,8 +161,11 @@ public class AppInit implements ApplicationContextAware, IAppInitializer {
 		
 		initSingleProducer(getLobbyUpdateViewAckEventProducer, KafkaUtils.GET_LOBBY_UPDATE_VIEW_ACK_EVENT_TOPIC, getLobbyUpdateViewQueue);
 		
+		initSingleProducer(initGameRoomCompletedEventProducer, KafkaUtils.INIT_GAME_ROOM_COMPLETED_EVENT_TOPIC, initGameRoomCompletedQueue);
+		
 		executeProducersAndConsumers(Arrays.asList(getAllGameRoomsAckEventProducer,
-				getLobbyUpdateViewAckEventProducer));	
+				getLobbyUpdateViewAckEventProducer,
+				initGameRoomCompletedEventProducer));	
 	}
 
 	@Override

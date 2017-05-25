@@ -51,4 +51,7 @@ public class KafkaUtils {
 	public static final String GET_LOBBY_UPDATE_VIEW_COMMAND_GROUP = "GetLobbyUpdateViewCommandGroup";
 	public static final String GET_LOBBY_UPDATE_VIEW_COMMAND_TOPIC = "Get-Lobby-Update-View-Command";
 	public static final String GET_LOBBY_UPDATE_VIEW_ACK_EVENT_TOPIC = "Get-Lobby-Update-View-Ack-Event";
+	public static final String USER_ADDED_AS_SECOND_PLAYER_EVENT_GROUP = "UserAddedAsSecondPlayereventGroup2";
+	public static final String USER_ADDED_AS_SECOND_PLAYER_EVENT_TOPIC = "User-Added-As-Second-Player-Event";
+	public static final String INIT_GAME_ROOM_COMPLETED_EVENT_TOPIC = "Init-Game-Room-Completed-Event";
 }
