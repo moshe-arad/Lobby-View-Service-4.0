@@ -4,11 +4,9 @@ import java.io.IOException;
 
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.moshe.arad.kafka.ConsumerToProducerQueue;
-import org.moshe.arad.kafka.events.GameRoomClosedEvent;
-import org.moshe.arad.kafka.events.NewGameRoomOpenedEvent;
-import org.moshe.arad.kafka.events.NewGameRoomOpenedEventAck;
 import org.moshe.arad.kafka.events.UserAddedAsWatcherEvent;
 import org.moshe.arad.services.LobbyView;
+import org.moshe.arad.services.LobbyViewChanges;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +20,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 @Scope("prototype")
 public class UserAddedAsWatcherEventConsumer extends SimpleEventsConsumer {
 
+//	@Autowired
+//	private LobbyViewOld lobbyView;
+	
 	@Autowired
 	private LobbyView lobbyView;
 	
@@ -38,12 +39,16 @@ public class UserAddedAsWatcherEventConsumer extends SimpleEventsConsumer {
 	@Override
 	public void consumerOperations(ConsumerRecord<String, String> record) {
 		UserAddedAsWatcherEvent userAddedAsWatcherEvent = convertJsonBlobIntoEvent(record.value());
+		LobbyViewChanges lobbyViewChanges = context.getBean(LobbyViewChanges.class);
 		
 		try{			
 			logger.info("Will add game room...");
 			lobbyView.addGameRoom(userAddedAsWatcherEvent.getGameRoom());
 			lobbyView.addUserAsWatcher(userAddedAsWatcherEvent.getUsername(), userAddedAsWatcherEvent.getGameRoom().getName());
-			lobbyView.markWatcherAddUpdateView(userAddedAsWatcherEvent.getGameRoom().getName(), userAddedAsWatcherEvent.getUsername());
+			
+			lobbyViewChanges.getAddWatchers().put(userAddedAsWatcherEvent.getGameRoom().getName(), userAddedAsWatcherEvent.getUsername());
+			lobbyView.markNeedToUpdateGroupUsers(lobbyViewChanges, "lobby");
+	
 			logger.info("Game room added to view");
 		}
 		catch(Exception e){

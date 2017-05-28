@@ -8,6 +8,7 @@ import java.util.concurrent.Executors;
 import org.moshe.arad.kafka.ConsumerToProducerQueue;
 import org.moshe.arad.kafka.KafkaUtils;
 import org.moshe.arad.kafka.consumers.ISimpleConsumer;
+import org.moshe.arad.kafka.consumers.command.GetAllGameRoomsCommandConsumer;
 import org.moshe.arad.kafka.consumers.command.GetLobbyUpdateViewCommandConsumer;
 import org.moshe.arad.kafka.consumers.config.GameRoomClosedEventConfig;
 import org.moshe.arad.kafka.consumers.config.GameRoomClosedEventLogoutConfig;
@@ -61,6 +62,8 @@ public class AppInit implements ApplicationContextAware, IAppInitializer {
 	@Autowired
 	private UserAddedAsWatcherEventConfig userAddedAsWatcherEventConfig;
 	
+	private GetAllGameRoomsCommandConsumer getAllGameRoomsCommandConsumer;
+	
 	@Autowired
 	private GetAllGameRoomsCommandConfig getAllGameRoomsCommandConfig;
 	
@@ -108,11 +111,15 @@ public class AppInit implements ApplicationContextAware, IAppInitializer {
 		
 		for(int i=0; i<NUM_CONSUMERS; i++){			
 			getLobbyUpdateViewCommandConsumer = context.getBean(GetLobbyUpdateViewCommandConsumer.class);
-		
+			getAllGameRoomsCommandConsumer = context.getBean(GetAllGameRoomsCommandConsumer.class);
+			
 			initSingleConsumer(getLobbyUpdateViewCommandConsumer, KafkaUtils.GET_LOBBY_UPDATE_VIEW_COMMAND_TOPIC, getLobbyUpdateViewCommandConfig, getLobbyUpdateViewQueue);
 			
+			initSingleConsumer(getAllGameRoomsCommandConsumer, KafkaUtils.GET_ALL_GAME_ROOMS_COMMAND_TOPIC, getAllGameRoomsCommandConfig, null);
+			
 			executeProducersAndConsumers(Arrays.asList(
-					getLobbyUpdateViewCommandConsumer));
+					getLobbyUpdateViewCommandConsumer,
+					getAllGameRoomsCommandConsumer));
 		}
 	}
 

@@ -5,9 +5,8 @@ import java.io.IOException;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.moshe.arad.kafka.ConsumerToProducerQueue;
 import org.moshe.arad.kafka.events.GameRoomClosedEvent;
-import org.moshe.arad.kafka.events.NewGameRoomOpenedEvent;
-import org.moshe.arad.kafka.events.NewGameRoomOpenedEventAck;
 import org.moshe.arad.services.LobbyView;
+import org.moshe.arad.services.LobbyViewChanges;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,7 +19,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 @Component
 @Scope("prototype")
 public class GameRoomClosedEventLogoutConsumer extends SimpleEventsConsumer {
-
+	
 	@Autowired
 	private LobbyView lobbyView;
 	
@@ -37,6 +36,7 @@ public class GameRoomClosedEventLogoutConsumer extends SimpleEventsConsumer {
 	@Override
 	public void consumerOperations(ConsumerRecord<String, String> record) {
 		GameRoomClosedEvent gameRoomClosedEvent = convertJsonBlobIntoEvent(record.value());
+		LobbyViewChanges lobbyViewChanges = context.getBean(LobbyViewChanges.class);
 		
 		try{			
 			logger.info("Will delete game room...");
@@ -44,7 +44,9 @@ public class GameRoomClosedEventLogoutConsumer extends SimpleEventsConsumer {
 			lobbyView.deleteOpenedByUser(gameRoomClosedEvent.getGameRoom(), gameRoomClosedEvent.getGameRoom().getOpenBy());
 			logger.info("Game room deleted to view");
 			logger.info("Will mark view update...");
-			lobbyView.markGameRoomClosedUpdateView(gameRoomClosedEvent.getGameRoom().getName());
+			
+			lobbyViewChanges.getGameRoomsDelete().add(gameRoomClosedEvent.getGameRoom().getName());
+			lobbyView.markNeedToUpdateGroupUsers(lobbyViewChanges, "lobby");
 		}
 		catch(Exception e){
 			logger.error("Failed to add new game room to view...");

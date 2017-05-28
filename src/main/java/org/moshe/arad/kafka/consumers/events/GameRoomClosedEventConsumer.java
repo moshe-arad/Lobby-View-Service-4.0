@@ -5,8 +5,6 @@ import java.io.IOException;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.moshe.arad.kafka.ConsumerToProducerQueue;
 import org.moshe.arad.kafka.events.GameRoomClosedEvent;
-import org.moshe.arad.kafka.events.NewGameRoomOpenedEvent;
-import org.moshe.arad.kafka.events.NewGameRoomOpenedEventAck;
 import org.moshe.arad.services.LobbyView;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,6 +19,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 @Scope("prototype")
 public class GameRoomClosedEventConsumer extends SimpleEventsConsumer {
 
+//	@Autowired
+//	private LobbyViewOld lobbyView;
+	
 	@Autowired
 	private LobbyView lobbyView;
 	

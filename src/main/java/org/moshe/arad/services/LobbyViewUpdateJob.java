@@ -10,27 +10,32 @@ import org.springframework.stereotype.Component;
 
 @Component
 @Scope("prototype")
-public class UpdateViewJob implements Callable<Set<String>>{
+public class LobbyViewUpdateJob implements Callable<Boolean>{
 
+	private String keyToFind;
 	private RedisTemplate<String, String> redisTemplate;
-	public static final String NEED_TO_UPDATE = "NeedToUpdate";
 	
 	@Autowired
-    public UpdateViewJob(final RedisTemplate<String, String> redisTemplate) {
+    public LobbyViewUpdateJob(final RedisTemplate<String, String> redisTemplate) {
         this.redisTemplate = redisTemplate;
     }
 	
 	@Override
-	public Set<String> call() throws Exception {
-		Set<String> keys = null;
+	public Boolean call() throws Exception {
+		Boolean result = null;
 		
 		while(true){
-			keys = redisTemplate.keys(NEED_TO_UPDATE + ":*");
-			if(keys != null && !keys.isEmpty()){
-				break;
-			}
-			else Thread.sleep(50);
+			result = redisTemplate.hasKey(keyToFind);
+			if(result == true) return result;
+			else Thread.sleep(10);
 		}
-		return keys;
+	}
+
+	public String getKeyToFind() {
+		return keyToFind;
+	}
+
+	public void setKeyToFind(String keyToFind) {
+		this.keyToFind = keyToFind;
 	}
 }

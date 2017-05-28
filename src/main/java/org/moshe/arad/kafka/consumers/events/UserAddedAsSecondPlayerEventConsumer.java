@@ -5,13 +5,10 @@ import java.util.Date;
 
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.moshe.arad.kafka.ConsumerToProducerQueue;
-import org.moshe.arad.kafka.events.GameRoomClosedEvent;
 import org.moshe.arad.kafka.events.InitGameRoomCompletedEvent;
-import org.moshe.arad.kafka.events.NewGameRoomOpenedEvent;
-import org.moshe.arad.kafka.events.NewGameRoomOpenedEventAck;
 import org.moshe.arad.kafka.events.UserAddedAsSecondPlayerEvent;
-import org.moshe.arad.kafka.events.UserAddedAsWatcherEvent;
 import org.moshe.arad.services.LobbyView;
+import org.moshe.arad.services.LobbyViewChanges;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,6 +22,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 @Scope("prototype")
 public class UserAddedAsSecondPlayerEventConsumer extends SimpleEventsConsumer {
 
+//	@Autowired
+//	private LobbyViewOld lobbyView;
+	
 	@Autowired
 	private LobbyView lobbyView;
 	
@@ -41,12 +41,15 @@ public class UserAddedAsSecondPlayerEventConsumer extends SimpleEventsConsumer {
 	@Override
 	public void consumerOperations(ConsumerRecord<String, String> record) {
 		UserAddedAsSecondPlayerEvent userAddedAsSecondPlayerEvent = convertJsonBlobIntoEvent(record.value());
+		LobbyViewChanges lobbyViewChanges = context.getBean(LobbyViewChanges.class);
 		
 		try{			
 			logger.info("Will add game room...");
 			lobbyView.addGameRoom(userAddedAsSecondPlayerEvent.getGameRoom());
 			lobbyView.addUserAsSecondPlayer(userAddedAsSecondPlayerEvent.getUsername(), userAddedAsSecondPlayerEvent.getGameRoom().getName());
-			lobbyView.markSecondPlayerAddUpdateView(userAddedAsSecondPlayerEvent.getGameRoom().getName(), userAddedAsSecondPlayerEvent.getUsername());
+			
+			lobbyViewChanges.getAddSecondPlayer().put(userAddedAsSecondPlayerEvent.getGameRoom().getName(), userAddedAsSecondPlayerEvent.getUsername());
+			lobbyView.markNeedToUpdateGroupUsers(lobbyViewChanges, "lobby");
 			
 			InitGameRoomCompletedEvent initGameRoomCompletedEvent = context.getBean(InitGameRoomCompletedEvent.class);
 			initGameRoomCompletedEvent.setUuid(userAddedAsSecondPlayerEvent.getUuid());
