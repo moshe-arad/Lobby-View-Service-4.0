@@ -6,7 +6,7 @@ import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.moshe.arad.kafka.ConsumerToProducerQueue;
 import org.moshe.arad.kafka.commands.GetLobbyUpdateViewCommand;
 import org.moshe.arad.kafka.events.GetLobbyUpdateViewAckEvent;
-import org.moshe.arad.services.LobbyView;
+import org.moshe.arad.services.UsersView;
 import org.moshe.arad.services.LobbyViewChanges;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,7 +28,7 @@ public class GetLobbyUpdateViewCommandConsumer extends SimpleCommandsConsumer {
 //	private LobbyViewOld lobbyView;
 	
 	@Autowired
-	private LobbyView lobbyView;
+	private UsersView lobbyView;
 	
 	@Autowired
 	private ApplicationContext context;

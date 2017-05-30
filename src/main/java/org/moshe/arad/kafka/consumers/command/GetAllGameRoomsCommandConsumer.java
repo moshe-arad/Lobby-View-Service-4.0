@@ -9,7 +9,7 @@ import org.moshe.arad.kafka.ConsumerToProducerQueue;
 import org.moshe.arad.kafka.commands.GetAllGameRoomsCommand;
 import org.moshe.arad.kafka.commands.GetLobbyUpdateViewCommand;
 import org.moshe.arad.kafka.events.GetLobbyUpdateViewAckEvent;
-import org.moshe.arad.services.LobbyView;
+import org.moshe.arad.services.UsersView;
 import org.moshe.arad.services.LobbyViewChanges;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,7 +28,7 @@ public class GetAllGameRoomsCommandConsumer extends SimpleCommandsConsumer {
 	private Logger logger = LoggerFactory.getLogger(GetAllGameRoomsCommandConsumer.class);
 	
 	@Autowired
-	private LobbyView lobbyView;
+	private UsersView lobbyView;
 	
 	@Autowired
 	private ApplicationContext context;
