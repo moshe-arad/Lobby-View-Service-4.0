@@ -5,7 +5,7 @@ import java.io.IOException;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.moshe.arad.kafka.ConsumerToProducerQueue;
 import org.moshe.arad.kafka.events.GameRoomClosedEvent;
-import org.moshe.arad.services.UsersView;
+import org.moshe.arad.services.LobbyView;
 import org.moshe.arad.services.LobbyViewChanges;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,7 +21,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 public class GameRoomClosedEventLogoutConsumer extends SimpleEventsConsumer {
 	
 	@Autowired
-	private UsersView lobbyView;
+	private LobbyView lobbyView;
 	
 	@Autowired
 	private ApplicationContext context;

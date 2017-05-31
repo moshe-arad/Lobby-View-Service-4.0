@@ -7,7 +7,7 @@ import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.moshe.arad.kafka.ConsumerToProducerQueue;
 import org.moshe.arad.kafka.events.InitGameRoomCompletedEvent;
 import org.moshe.arad.kafka.events.UserAddedAsSecondPlayerEvent;
-import org.moshe.arad.services.UsersView;
+import org.moshe.arad.services.LobbyView;
 import org.moshe.arad.services.LobbyViewChanges;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,7 +26,7 @@ public class UserAddedAsSecondPlayerEventConsumer extends SimpleEventsConsumer {
 //	private LobbyViewOld lobbyView;
 	
 	@Autowired
-	private UsersView lobbyView;
+	private LobbyView lobbyView;
 	
 	@Autowired
 	private ApplicationContext context;
