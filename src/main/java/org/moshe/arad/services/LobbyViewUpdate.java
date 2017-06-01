@@ -140,7 +140,7 @@ public class LobbyViewUpdate {
 			
 			if(!redisTemplate.hasKey(NEED_TO_UPDATE + ":" + ALL)){
 				try {
-					allLocker.wait();
+					allLocker.wait(5000);
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				}
@@ -168,7 +168,7 @@ public class LobbyViewUpdate {
 			
 			if(!redisTemplate.hasKey(NEED_TO_UPDATE + ":" + GROUP + ":" + group)){
 				try {
-					groupLocker.wait();
+					groupLocker.wait(5000);
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				}
@@ -196,7 +196,7 @@ public class LobbyViewUpdate {
 			
 			if(!redisTemplate.hasKey(NEED_TO_UPDATE + ":" + USER + ":" + username)){
 				try {
-					userLocker.wait();
+					userLocker.wait(5000);
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				}

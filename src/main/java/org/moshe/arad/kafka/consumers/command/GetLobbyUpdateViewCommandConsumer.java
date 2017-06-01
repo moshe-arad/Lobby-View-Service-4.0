@@ -24,9 +24,6 @@ public class GetLobbyUpdateViewCommandConsumer extends SimpleCommandsConsumer {
 	private ConsumerToProducerQueue consumerToProducerQueue;
 	private Logger logger = LoggerFactory.getLogger(GetLobbyUpdateViewCommandConsumer.class);
 	
-//	@Autowired
-//	private LobbyViewOld lobbyView;
-	
 	@Autowired
 	private LobbyView lobbyView;
 	
