@@ -10,21 +10,15 @@ import org.moshe.arad.kafka.KafkaUtils;
 import org.moshe.arad.kafka.consumers.ISimpleConsumer;
 import org.moshe.arad.kafka.consumers.command.GetAllGameRoomsCommandConsumer;
 import org.moshe.arad.kafka.consumers.command.GetLobbyUpdateViewCommandConsumer;
-import org.moshe.arad.kafka.consumers.config.GameRoomClosedEventConfig;
-import org.moshe.arad.kafka.consumers.config.GameRoomClosedEventLogoutConfig;
 import org.moshe.arad.kafka.consumers.config.GetAllGameRoomsCommandConfig;
 import org.moshe.arad.kafka.consumers.config.GetLobbyUpdateViewCommandConfig;
 import org.moshe.arad.kafka.consumers.config.NewGameRoomOpenedEventConfig;
 import org.moshe.arad.kafka.consumers.config.SimpleConsumerConfig;
 import org.moshe.arad.kafka.consumers.config.UserAddedAsSecondPlayerEventConfig;
 import org.moshe.arad.kafka.consumers.config.UserAddedAsWatcherEventConfig;
-import org.moshe.arad.kafka.consumers.config.WatcherRemovedEventConfig;
-import org.moshe.arad.kafka.consumers.events.GameRoomClosedEventConsumer;
-import org.moshe.arad.kafka.consumers.events.GameRoomClosedEventLogoutConsumer;
 import org.moshe.arad.kafka.consumers.events.NewGameRoomOpenedEventConsumer;
 import org.moshe.arad.kafka.consumers.events.UserAddedAsSecondPlayerEventConsumer;
 import org.moshe.arad.kafka.consumers.events.UserAddedAsWatcherEventConsumer;
-import org.moshe.arad.kafka.consumers.events.WatcherRemovedEventConsumer;
 import org.moshe.arad.kafka.events.GetAllGameRoomsAckEvent;
 import org.moshe.arad.kafka.events.GetLobbyUpdateViewAckEvent;
 import org.moshe.arad.kafka.events.InitGameRoomCompletedEvent;
@@ -52,11 +46,6 @@ public class AppInit implements ApplicationContextAware, IAppInitializer {
 	@Autowired
 	private NewGameRoomOpenedEventConfig newGameRoomOpenedEventConfig;
 	
-	private GameRoomClosedEventConsumer gameRoomClosedEventConsumer;
-	
-	@Autowired
-	private GameRoomClosedEventConfig GameRoomClosedEventConfig;
-	
 	private UserAddedAsWatcherEventConsumer userAddedAsWatcherEventConsumer;
 	
 	@Autowired
@@ -71,16 +60,6 @@ public class AppInit implements ApplicationContextAware, IAppInitializer {
 	private SimpleEventsProducer<GetAllGameRoomsAckEvent> getAllGameRoomsAckEventProducer;
 	
 	private ConsumerToProducerQueue getAllGameRoomsQueue;
-	
-	private GameRoomClosedEventLogoutConsumer gameRoomClosedEventLogoutConsumer;
-	
-	@Autowired
-	private GameRoomClosedEventLogoutConfig gameRoomClosedEventLogoutConfig;
-	
-	private WatcherRemovedEventConsumer watcherRemovedEventConsumer;
-	
-	@Autowired
-	private WatcherRemovedEventConfig watcherRemovedEventConfig;
 	
 	private GetLobbyUpdateViewCommandConsumer getLobbyUpdateViewCommandConsumer;
 	
@@ -130,29 +109,17 @@ public class AppInit implements ApplicationContextAware, IAppInitializer {
 		
 		for(int i=0; i<NUM_CONSUMERS; i++){
 			newGameRoomOpenedEventConsumer = context.getBean(NewGameRoomOpenedEventConsumer.class);			
-			gameRoomClosedEventConsumer = context.getBean(GameRoomClosedEventConsumer.class);
 			userAddedAsWatcherEventConsumer = context.getBean(UserAddedAsWatcherEventConsumer.class);
-			gameRoomClosedEventLogoutConsumer = context.getBean(GameRoomClosedEventLogoutConsumer.class);
-			watcherRemovedEventConsumer = context.getBean(WatcherRemovedEventConsumer.class);
 			userAddedAsSecondPlayerEventConsumer = context.getBean(UserAddedAsSecondPlayerEventConsumer.class);
 			
 			initSingleConsumer(newGameRoomOpenedEventConsumer, KafkaUtils.NEW_GAME_ROOM_OPENED_EVENT_TOPIC, newGameRoomOpenedEventConfig, null);
 			
-			initSingleConsumer(gameRoomClosedEventConsumer, KafkaUtils.GAME_ROOM_CLOSED_EVENT_TOPIC, GameRoomClosedEventConfig, null);
-			
 			initSingleConsumer(userAddedAsWatcherEventConsumer, KafkaUtils.USER_ADDED_AS_WATCHER_EVENT_TOPIC, userAddedAsWatcherEventConfig, null);
-			
-			initSingleConsumer(gameRoomClosedEventLogoutConsumer, KafkaUtils.GAME_ROOM_CLOSED_EVENT_LOGOUT_TOPIC, gameRoomClosedEventLogoutConfig, null);
-			
-			initSingleConsumer(watcherRemovedEventConsumer, KafkaUtils.WATCHER_REMOVED_EVENT_TOPIC, watcherRemovedEventConfig, null);
 			
 			initSingleConsumer(userAddedAsSecondPlayerEventConsumer, KafkaUtils.USER_ADDED_AS_SECOND_PLAYER_EVENT_TOPIC, userAddedAsSecondPlayerEventConfig, initGameRoomCompletedQueue);
 			
 			executeProducersAndConsumers(Arrays.asList(newGameRoomOpenedEventConsumer, 
-					gameRoomClosedEventConsumer,
 					userAddedAsWatcherEventConsumer,
-					gameRoomClosedEventLogoutConsumer,
-					watcherRemovedEventConsumer,
 					userAddedAsSecondPlayerEventConsumer));
 		}
 	}
