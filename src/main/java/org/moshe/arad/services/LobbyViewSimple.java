@@ -60,8 +60,12 @@ public class LobbyViewSimple {
 		redisTemplate.opsForHash().delete(GAME_ROOMS, gameRoom.getName());
 	}
 	
-	public void deleteOpenedByUser(GameRoom gameRoom, String username){
+	public void deleteOpenedByUser(String username){
 		redisTemplate.opsForHash().delete(USERS_OPENED_BY, username);
+	}
+	
+	public void deleteSecondUser(String username){
+		redisTemplate.opsForHash().delete(USERS_SECOND_PLAYER, username);
 	}
 	
 	public void addUserAsWatcher(String username, String gameRoomName){
@@ -106,5 +110,17 @@ public class LobbyViewSimple {
 		}
 		
 		return result;
+	}
+	
+	public GameRoom getGameRoom(String gameRoomName){
+		String gameRoomJson = redisTemplate.opsForHash().get(GAME_ROOMS, gameRoomName).toString();
+		ObjectMapper objectMapper = new ObjectMapper();
+		GameRoom room = null;
+		try {
+			room = objectMapper.readValue(gameRoomJson, GameRoom.class);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return room;
 	}
 }

@@ -59,8 +59,12 @@ public class LobbyView {
 		lobbyViewSimple.deleteGameRoom(gameRoom);
 	}
 	
-	public void deleteOpenedByUser(GameRoom gameRoom, String username){
-		lobbyViewSimple.deleteOpenedByUser(gameRoom, username);
+	public void deleteOpenedByUser(String username){
+		lobbyViewSimple.deleteOpenedByUser(username);
+	}
+	
+	public void deleteSecondUser(String username){
+		lobbyViewSimple.deleteSecondUser(username);
 	}
 	
 	public void addUserAsWatcher(String username, String gameRoomName){
@@ -77,5 +81,9 @@ public class LobbyView {
 	
 	public List<GameRoom> getAllGameRooms(){
 		return lobbyViewSimple.getAllGameRooms();
+	}
+	
+	public GameRoom getGameRoom(String gameRoomName){
+		return lobbyViewSimple.getGameRoom(gameRoomName);
 	}
 }

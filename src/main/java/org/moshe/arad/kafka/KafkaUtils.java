@@ -54,4 +54,8 @@ public class KafkaUtils {
 	public static final String USER_ADDED_AS_SECOND_PLAYER_EVENT_GROUP = "UserAddedAsSecondPlayereventGroup2";
 	public static final String USER_ADDED_AS_SECOND_PLAYER_EVENT_TOPIC = "User-Added-As-Second-Player-Event";
 	public static final String INIT_GAME_ROOM_COMPLETED_EVENT_TOPIC = "Init-Game-Room-Completed-Event";
+	public static final String LOGGED_OUT_OPENBY_LEFT_BEFORE_GAME_STARTED_EVENT_GROUP = "LoggedOutOpenbyLeftBeforeGameStartedEventGroup4";
+	public static final String LOGGED_OUT_OPENBY_LEFT_BEFORE_GAME_STARTED_EVENT_TOPIC = "Logged-Out-Openby-Left-Before-Game-Started-Event";
+	public static final String GAME_ROOM_CLOSED_LOGGED_OUT_OPENBY_LEFT_BEFORE_GAME_STARTED_EVENT_GROUP = "GameRoomClosedLoggedOutOpenbyLeftBeforeGameStartedEventGroup2";
+	public static final String GAME_ROOM_CLOSED_LOGGED_OUT_OPENBY_LEFT_BEFORE_GAME_STARTED_EVENT_TOPIC = "Game-Room-Closed-Logged-Out-Openby-Left-Before-Game-Started-Event";
 }
