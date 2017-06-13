@@ -80,4 +80,8 @@ public class KafkaUtils {
 	public static final String LOGGED_OUT_SECOND_LEFT_LAST_EVENT_GROUP = "LoggedOutSecondLeftLastEventGroup4";
 	public static final String LOGGED_OUT_SECOND_LEFT_LAST_EVENT_TOPIC = "Logged-Out-Second-Left-Last-Event";
 	public static final String GAME_ROOM_CLOSED_LOGGED_OUT_SECOND_LEFT_LAST_EVENT_TOPIC = "Game-Room-Closed-Logged-Out-Second-Left-Last-Event";
+	public static final String OPENBY_LEFT_BEFORE_GAME_STARTED_EVENT_GROUP = "OpenbyLeftBeforeGameStartedEventGroup3";
+	public static final String OPENBY_LEFT_BEFORE_GAME_STARTED_EVENT_TOPIC = "Openby-Left-Before-Game-Started-Event";
+	public static final String GAME_ROOM_CLOSED_OPENBY_LEFT_BEFORE_GAME_STARTED_EVENT_GROUP = "GameRoomClosedOpenbyLeftBeforeGameStartedEventGroup2";
+	public static final String GAME_ROOM_CLOSED_OPENBY_LEFT_BEFORE_GAME_STARTED_EVENT_TOPIC = "Game-Room-Closed-Openby-Left-Before-Game-Started-Event";
 }
