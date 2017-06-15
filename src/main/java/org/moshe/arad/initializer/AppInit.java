@@ -31,6 +31,7 @@ import org.moshe.arad.kafka.consumers.config.NewGameRoomOpenedEventConfig;
 import org.moshe.arad.kafka.consumers.config.OpenByLeftBeforeGameStartedEventConfig;
 import org.moshe.arad.kafka.consumers.config.OpenByLeftEventConfig;
 import org.moshe.arad.kafka.consumers.config.OpenByLeftFirstEventConfig;
+import org.moshe.arad.kafka.consumers.config.SecondLeftFirstEventConfig;
 import org.moshe.arad.kafka.consumers.config.SimpleConsumerConfig;
 import org.moshe.arad.kafka.consumers.config.UserAddedAsSecondPlayerEventConfig;
 import org.moshe.arad.kafka.consumers.config.UserAddedAsWatcherEventConfig;
@@ -55,6 +56,7 @@ import org.moshe.arad.kafka.consumers.events.NewGameRoomOpenedEventConsumer;
 import org.moshe.arad.kafka.consumers.events.OpenByLeftBeforeGameStartedEventConsumer;
 import org.moshe.arad.kafka.consumers.events.OpenByLeftEventConsumer;
 import org.moshe.arad.kafka.consumers.events.OpenByLeftFirstEventConsumer;
+import org.moshe.arad.kafka.consumers.events.SecondLeftFirstEventConsumer;
 import org.moshe.arad.kafka.consumers.events.UserAddedAsSecondPlayerEventConsumer;
 import org.moshe.arad.kafka.consumers.events.UserAddedAsWatcherEventConsumer;
 import org.moshe.arad.kafka.consumers.events.WatcherLeftEventConsumer;
@@ -221,6 +223,11 @@ public class AppInit implements ApplicationContextAware, IAppInitializer {
 	@Autowired
 	private OpenByLeftFirstEventConfig openByLeftFirstEventConfig;
 	
+	private SecondLeftFirstEventConsumer secondLeftFirstEventConsumer;
+	
+	@Autowired
+	private SecondLeftFirstEventConfig secondLeftFirstEventConfig;
+	
 	public static final int NUM_CONSUMERS = 3;
 	
 	@Override
@@ -271,6 +278,7 @@ public class AppInit implements ApplicationContextAware, IAppInitializer {
 			gameRoomClosedWatcherLeftLastEventConsumer = context.getBean(GameRoomClosedWatcherLeftLastEventConsumer.class);
 			watcherLeftEventConsumer = context.getBean(WatcherLeftEventConsumer.class);
 			openByLeftFirstEventConsumer = context.getBean(OpenByLeftFirstEventConsumer.class);
+			secondLeftFirstEventConsumer = context.getBean(SecondLeftFirstEventConsumer.class);
 			
 			initSingleConsumer(newGameRoomOpenedEventConsumer, KafkaUtils.NEW_GAME_ROOM_OPENED_EVENT_TOPIC, newGameRoomOpenedEventConfig, null);
 			
@@ -318,6 +326,8 @@ public class AppInit implements ApplicationContextAware, IAppInitializer {
 			
 			initSingleConsumer(openByLeftFirstEventConsumer, KafkaUtils.OPENBY_LEFT_FIRST_EVENT_TOPIC, openByLeftFirstEventConfig, null);
 			
+			initSingleConsumer(secondLeftFirstEventConsumer, KafkaUtils.SECOND_LEFT_FIRST_EVENT_TOPIC, secondLeftFirstEventConfig, null);
+			
 			executeProducersAndConsumers(Arrays.asList(newGameRoomOpenedEventConsumer, 
 					userAddedAsWatcherEventConsumer,
 					userAddedAsSecondPlayerEventConsumer,
@@ -340,7 +350,8 @@ public class AppInit implements ApplicationContextAware, IAppInitializer {
 					watcherLeftLastEventConsumer,
 					gameRoomClosedWatcherLeftLastEventConsumer,
 					watcherLeftEventConsumer,
-					openByLeftFirstEventConsumer));
+					openByLeftFirstEventConsumer,
+					secondLeftFirstEventConsumer));
 		}
 	}
 

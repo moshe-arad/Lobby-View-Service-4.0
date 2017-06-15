@@ -94,4 +94,6 @@ public class KafkaUtils {
 	public static final String WATCHER_LEFT_EVENT_TOPIC = "Watcher-Left-Event";
 	public static final String OPENBY_LEFT_FIRST_EVENT_GROUP = "OpenbyLeftFirstEventGroup3";
 	public static final String OPENBY_LEFT_FIRST_EVENT_TOPIC = "Openby-Left-First-Event";
+	public static final String SECOND_LEFT_FIRST_EVENT_GROUP = "SecondLeftFirstEventGroup3";
+	public static final String SECOND_LEFT_FIRST_EVENT_TOPIC = "Second-Left-First-Event";
 }
