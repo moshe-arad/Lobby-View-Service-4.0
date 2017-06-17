@@ -7,7 +7,7 @@ import org.moshe.arad.entities.GameRoom;
 import org.moshe.arad.kafka.ConsumerToProducerQueue;
 import org.moshe.arad.kafka.events.LoggedOutOpenByLeftLastEvent;
 import org.moshe.arad.kafka.events.LoggedOutWatcherLeftLastEvent;
-import org.moshe.arad.services.LobbyView;
+import org.moshe.arad.view.utils.LobbyView;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

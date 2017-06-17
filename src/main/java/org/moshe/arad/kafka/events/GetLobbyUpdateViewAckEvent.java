@@ -8,7 +8,7 @@ import java.util.Map;
 import java.util.UUID;
 
 import org.moshe.arad.entities.GameRoom;
-import org.moshe.arad.services.LobbyViewChanges;
+import org.moshe.arad.view.utils.LobbyViewChanges;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
