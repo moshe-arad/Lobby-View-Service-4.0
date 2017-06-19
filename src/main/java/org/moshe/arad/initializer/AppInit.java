@@ -73,7 +73,6 @@ import org.moshe.arad.kafka.consumers.events.WatcherLeftEventConsumer;
 import org.moshe.arad.kafka.consumers.events.WatcherLeftLastEventConsumer;
 import org.moshe.arad.kafka.events.GetAllGameRoomsAckEvent;
 import org.moshe.arad.kafka.events.GetLobbyUpdateViewAckEvent;
-import org.moshe.arad.kafka.events.InitGameRoomCompletedEvent;
 import org.moshe.arad.kafka.producers.ISimpleProducer;
 import org.moshe.arad.kafka.producers.events.SimpleEventsProducer;
 import org.slf4j.Logger;
@@ -134,9 +133,6 @@ public class AppInit implements ApplicationContextAware, IAppInitializer {
 	private LoggedOutOpenByLeftBeforeGameStartedEventConfig loggedOutOpenByLeftBeforeGameStartedEventConfig;
 	
 	private ConsumerToProducerQueue initGameRoomCompletedQueue;
-	
-	@Autowired
-	private SimpleEventsProducer<InitGameRoomCompletedEvent> initGameRoomCompletedEventProducer;
 	
 	private GameRoomClosedLoggedOutOpenByLeftBeforeGameStartedEventConsumer gameRoomClosedLoggedOutOpenByLeftBeforeGameStartedEventConsumer;
 	
@@ -421,11 +417,8 @@ public class AppInit implements ApplicationContextAware, IAppInitializer {
 		
 		initSingleProducer(getLobbyUpdateViewAckEventProducer, KafkaUtils.GET_LOBBY_UPDATE_VIEW_ACK_EVENT_TOPIC, getLobbyUpdateViewQueue);
 		
-		initSingleProducer(initGameRoomCompletedEventProducer, KafkaUtils.INIT_GAME_ROOM_COMPLETED_EVENT_TOPIC, initGameRoomCompletedQueue);
-		
 		executeProducersAndConsumers(Arrays.asList(getAllGameRoomsAckEventProducer,
-				getLobbyUpdateViewAckEventProducer,
-				initGameRoomCompletedEventProducer));	
+				getLobbyUpdateViewAckEventProducer));	
 	}
 
 	@Override
