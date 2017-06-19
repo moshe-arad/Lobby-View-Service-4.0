@@ -5,10 +5,10 @@ import org.moshe.arad.kafka.consumers.config.SimpleConsumerConfig;
 import org.springframework.stereotype.Component;
 
 @Component
-public class GameRoomClosedEventLogoutConfig extends SimpleConsumerConfig{
+public class LoggedOutOpenByLeftFirstEventConfig extends SimpleConsumerConfig{
 
-	public GameRoomClosedEventLogoutConfig() {
+	public LoggedOutOpenByLeftFirstEventConfig() {
 		super();
-		super.getProperties().put("group.id", KafkaUtils.GAME_ROOM_CLOSED_EVENT_LOGOUT_GROUP);
+		super.getProperties().put("group.id", KafkaUtils.LOGGED_OUT_OPENBY_LEFT_FIRST_EVENT_GROUP);
 	}
 }

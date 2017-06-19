@@ -4,10 +4,9 @@ import java.io.IOException;
 
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.moshe.arad.kafka.ConsumerToProducerQueue;
-import org.moshe.arad.kafka.events.GameRoomClosedEvent;
-import org.moshe.arad.kafka.events.NewGameRoomOpenedEvent;
-import org.moshe.arad.kafka.events.NewGameRoomOpenedEventAck;
-import org.moshe.arad.services.LobbyView;
+import org.moshe.arad.kafka.events.OpenByLeftFirstEvent;
+import org.moshe.arad.view.utils.LobbyView;
+import org.moshe.arad.view.utils.LobbyViewChanges;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,8 +18,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Component
 @Scope("prototype")
-public class GameRoomClosedEventLogoutConsumer extends SimpleEventsConsumer {
-
+public class OpenByLeftFirstEventConsumer extends SimpleEventsConsumer {
+	
 	@Autowired
 	private LobbyView lobbyView;
 	
@@ -29,22 +28,23 @@ public class GameRoomClosedEventLogoutConsumer extends SimpleEventsConsumer {
 	
 	private ConsumerToProducerQueue consumerToProducerQueue;
 	
-	Logger logger = LoggerFactory.getLogger(GameRoomClosedEventLogoutConsumer.class);
+	Logger logger = LoggerFactory.getLogger(OpenByLeftFirstEventConsumer.class);
 	
-	public GameRoomClosedEventLogoutConsumer() {
+	public OpenByLeftFirstEventConsumer() {
 	}
 	
 	@Override
 	public void consumerOperations(ConsumerRecord<String, String> record) {
-		GameRoomClosedEvent gameRoomClosedEvent = convertJsonBlobIntoEvent(record.value());
+		OpenByLeftFirstEvent openByLeftFirstEvent = convertJsonBlobIntoEvent(record.value());
+		LobbyViewChanges lobbyViewChanges = context.getBean(LobbyViewChanges.class);
 		
 		try{
-			logger.info("Will mark view update...");
-			lobbyView.markGameRoomClosedUpdateView(gameRoomClosedEvent.getGameRoom().getName());
-			logger.info("Will delete game room...");
-			lobbyView.deleteGameRoom(gameRoomClosedEvent.getGameRoom());
-			lobbyView.deleteOpenedByUser(gameRoomClosedEvent.getGameRoom(), gameRoomClosedEvent.getGameRoom().getOpenBy());
-			logger.info("Game room deleted to view");
+			lobbyView.addGameRoom(openByLeftFirstEvent.getGameRoom());
+			lobbyView.deleteOpenedByUser(openByLeftFirstEvent.getOpenBy());
+			
+			lobbyViewChanges.getLeavingPlayers().add(openByLeftFirstEvent.getOpenBy());
+			lobbyViewChanges.getGameRoomsUpdate().add(openByLeftFirstEvent.getGameRoom());
+			lobbyView.markNeedToUpdateGroupUsers(lobbyViewChanges, "lobby");
 		}
 		catch(Exception e){
 			logger.error("Failed to add new game room to view...");
@@ -53,10 +53,10 @@ public class GameRoomClosedEventLogoutConsumer extends SimpleEventsConsumer {
 		}
 	}
 	
-	private GameRoomClosedEvent convertJsonBlobIntoEvent(String JsonBlob){
+	private OpenByLeftFirstEvent convertJsonBlobIntoEvent(String JsonBlob){
 		ObjectMapper objectMapper = new ObjectMapper();
 		try {
-			return objectMapper.readValue(JsonBlob, GameRoomClosedEvent.class);
+			return objectMapper.readValue(JsonBlob, OpenByLeftFirstEvent.class);
 		} catch (IOException e) {
 			logger.error("Falied to convert Json blob into Event...");
 			logger.error(e.getMessage());

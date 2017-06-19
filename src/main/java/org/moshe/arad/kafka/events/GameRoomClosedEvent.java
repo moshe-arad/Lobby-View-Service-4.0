@@ -1,41 +1,47 @@
 package org.moshe.arad.kafka.events;
 
+import java.util.Date;
+import java.util.UUID;
+
 import org.moshe.arad.entities.GameRoom;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 @Component
 @Scope("prototype")
-public class GameRoomClosedEvent extends BackgammonEvent{
+public class GameRoomClosedEvent extends BackgammonEvent {
 
-	private String closedByUserName;
+	private String loggedOutUserName;
 	private GameRoom gameRoom;
-	
+
 	public GameRoomClosedEvent() {
-	
+		
 	}
 
-	public GameRoomClosedEvent(GameRoom gameRoom) {
+	public GameRoomClosedEvent(UUID uuid, int serviceId, int eventId, Date arrived, String clazz,
+			String closedByUserName, GameRoom gameRoom) {
+		super(uuid, serviceId, eventId, arrived, clazz);
+		this.loggedOutUserName = closedByUserName;
 		this.gameRoom = gameRoom;
 	}
-
+	
 	public GameRoomClosedEvent(String closedByUserName, GameRoom gameRoom) {
 		super();
-		this.closedByUserName = closedByUserName;
+		this.loggedOutUserName = closedByUserName;
 		this.gameRoom = gameRoom;
 	}
 
 	@Override
 	public String toString() {
-		return "GameRoomClosedEvent [closedByUserName=" + closedByUserName + ", gameRoom=" + gameRoom + "]";
+		return "GameRoomClosedEvent [closedByUserName=" + loggedOutUserName + ", gameRoom=" + gameRoom + "]";
 	}
 
-	public String getClosedByUserName() {
-		return closedByUserName;
+	public String getLoggedOutUserName() {
+		return loggedOutUserName;
 	}
 
-	public void setClosedByUserName(String closedByUserName) {
-		this.closedByUserName = closedByUserName;
+	public void setLoggedOutUserName(String loggedOutUserName) {
+		this.loggedOutUserName = loggedOutUserName;
 	}
 
 	public GameRoom getGameRoom() {

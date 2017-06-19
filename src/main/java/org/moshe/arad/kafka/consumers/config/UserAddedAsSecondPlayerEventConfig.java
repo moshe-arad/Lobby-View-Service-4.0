@@ -5,10 +5,10 @@ import org.moshe.arad.kafka.consumers.config.SimpleConsumerConfig;
 import org.springframework.stereotype.Component;
 
 @Component
-public class GameRoomClosedEventConfig extends SimpleConsumerConfig{
+public class UserAddedAsSecondPlayerEventConfig extends SimpleConsumerConfig{
 
-	public GameRoomClosedEventConfig() {
+	public UserAddedAsSecondPlayerEventConfig() {
 		super();
-		super.getProperties().put("group.id", KafkaUtils.GAME_ROOM_CLOSED_EVENT_GROUP);
+		super.getProperties().put("group.id", KafkaUtils.USER_ADDED_AS_SECOND_PLAYER_EVENT_GROUP);
 	}
 }

@@ -3,12 +3,16 @@ package org.moshe.arad.kafka.consumers.events;
 import java.io.IOException;
 
 import org.apache.kafka.clients.consumer.ConsumerRecord;
+import org.moshe.arad.entities.GameRoom;
 import org.moshe.arad.kafka.ConsumerToProducerQueue;
-import org.moshe.arad.kafka.events.GameRoomClosedEvent;
+import org.moshe.arad.kafka.events.LoggedOutOpenByLeftBeforeGameStartedEvent;
+import org.moshe.arad.kafka.events.LoggedOutOpenByLeftEvent;
+import org.moshe.arad.kafka.events.LoggedOutOpenByLeftFirstEvent;
+import org.moshe.arad.kafka.events.LoggedOutSecondLeftFirstEvent;
 import org.moshe.arad.kafka.events.NewGameRoomOpenedEvent;
-import org.moshe.arad.kafka.events.NewGameRoomOpenedEventAck;
-import org.moshe.arad.kafka.events.WatcherRemovedEvent;
-import org.moshe.arad.services.LobbyView;
+import org.moshe.arad.kafka.events.SecondLeftFirstEvent;
+import org.moshe.arad.view.utils.LobbyView;
+import org.moshe.arad.view.utils.LobbyViewChanges;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,8 +24,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Component
 @Scope("prototype")
-public class WatcherRemovedEventConsumer extends SimpleEventsConsumer {
-
+public class SecondLeftFirstEventConsumer extends SimpleEventsConsumer {
+	
 	@Autowired
 	private LobbyView lobbyView;
 	
@@ -30,21 +34,23 @@ public class WatcherRemovedEventConsumer extends SimpleEventsConsumer {
 	
 	private ConsumerToProducerQueue consumerToProducerQueue;
 	
-	Logger logger = LoggerFactory.getLogger(WatcherRemovedEventConsumer.class);
+	Logger logger = LoggerFactory.getLogger(SecondLeftFirstEventConsumer.class);
 	
-	public WatcherRemovedEventConsumer() {
+	public SecondLeftFirstEventConsumer() {
 	}
 	
 	@Override
 	public void consumerOperations(ConsumerRecord<String, String> record) {
-		WatcherRemovedEvent watcherRemovedEvent = convertJsonBlobIntoEvent(record.value());
+		SecondLeftFirstEvent secondLeftFirstEvent = convertJsonBlobIntoEvent(record.value());
+		LobbyViewChanges lobbyViewChanges = context.getBean(LobbyViewChanges.class);
 		
 		try{
-			logger.info("Will mark view update...");
-			lobbyView.markWatcherRemoveUpdateView(watcherRemovedEvent.getGameRoom().getName(), watcherRemovedEvent.getRemovedWatcher());
-			logger.info("Will delete watcher from game room...");
-			lobbyView.deleteWatcherFromGameRoom(watcherRemovedEvent.getRemovedWatcher());
-			logger.info("Watcher deleted to view");
+			lobbyView.addGameRoom(secondLeftFirstEvent.getGameRoom());
+			lobbyView.deleteSecondUser(secondLeftFirstEvent.getSecond());
+			
+			lobbyViewChanges.getLeavingPlayers().add(secondLeftFirstEvent.getSecond());
+			lobbyViewChanges.getGameRoomsUpdate().add(secondLeftFirstEvent.getGameRoom());
+			lobbyView.markNeedToUpdateGroupUsers(lobbyViewChanges, "lobby");
 		}
 		catch(Exception e){
 			logger.error("Failed to add new game room to view...");
@@ -53,10 +59,10 @@ public class WatcherRemovedEventConsumer extends SimpleEventsConsumer {
 		}
 	}
 	
-	private WatcherRemovedEvent convertJsonBlobIntoEvent(String JsonBlob){
+	private SecondLeftFirstEvent convertJsonBlobIntoEvent(String JsonBlob){
 		ObjectMapper objectMapper = new ObjectMapper();
 		try {
-			return objectMapper.readValue(JsonBlob, WatcherRemovedEvent.class);
+			return objectMapper.readValue(JsonBlob, SecondLeftFirstEvent.class);
 		} catch (IOException e) {
 			logger.error("Falied to convert Json blob into Event...");
 			logger.error(e.getMessage());

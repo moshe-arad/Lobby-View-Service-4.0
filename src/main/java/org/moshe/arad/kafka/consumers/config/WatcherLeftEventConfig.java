@@ -5,10 +5,10 @@ import org.moshe.arad.kafka.consumers.config.SimpleConsumerConfig;
 import org.springframework.stereotype.Component;
 
 @Component
-public class WatcherRemovedEventConfig extends SimpleConsumerConfig{
+public class WatcherLeftEventConfig extends SimpleConsumerConfig{
 
-	public WatcherRemovedEventConfig() {
+	public WatcherLeftEventConfig() {
 		super();
-		super.getProperties().put("group.id", KafkaUtils.WATCHER_REMOVED_EVENT_GROUP);
+		super.getProperties().put("group.id", KafkaUtils.WATCHER_LEFT_EVENT_GROUP);
 	}
 }

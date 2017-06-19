@@ -2,13 +2,16 @@ package org.moshe.arad.kafka.consumers.command;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.moshe.arad.entities.GameRoom;
 import org.moshe.arad.kafka.ConsumerToProducerQueue;
 import org.moshe.arad.kafka.commands.GetAllGameRoomsCommand;
-import org.moshe.arad.kafka.events.GetAllGameRoomsAckEvent;
-import org.moshe.arad.services.LobbyView;
+import org.moshe.arad.kafka.commands.GetLobbyUpdateViewCommand;
+import org.moshe.arad.kafka.events.GetLobbyUpdateViewAckEvent;
+import org.moshe.arad.view.utils.LobbyView;
+import org.moshe.arad.view.utils.LobbyViewChanges;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,16 +40,12 @@ public class GetAllGameRoomsCommandConsumer extends SimpleCommandsConsumer {
 	@Override
 	public void consumerOperations(ConsumerRecord<String, String> record) {
 		GetAllGameRoomsCommand getAllGameRoomsCommand = convertJsonBlobIntoEvent(record.value());
-		logger.info("Get All Game Rooms Command record recieved, " + record.value());
-    	
-		List<GameRoom> rooms = lobbyView.getAllGameRooms();
-		GetAllGameRoomsAckEvent getAllGameRoomsAckEvent = context.getBean(GetAllGameRoomsAckEvent.class);
-		getAllGameRoomsAckEvent.setGameRooms(rooms);
-		getAllGameRoomsAckEvent.setUuid(getAllGameRoomsCommand.getUuid());
+		LobbyViewChanges lobbyViewChanges = context.getBean(LobbyViewChanges.class);
 		
-    	logger.info("passing Get All Game Rooms Ack Event to producer...");
-    	consumerToProducerQueue.getEventsQueue().put(getAllGameRoomsAckEvent);
-    	logger.info("Event passed to producer...");		
+		List<GameRoom> rooms = lobbyView.getAllGameRooms();
+		lobbyViewChanges.setGameRoomsAdd(rooms);
+		
+		lobbyView.markNeedToUpdateSingleUser(lobbyViewChanges, getAllGameRoomsCommand.getUsername());
 	}
 
 	public ConsumerToProducerQueue getConsumerToProducerQueue() {

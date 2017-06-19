@@ -5,8 +5,8 @@ import java.io.IOException;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.moshe.arad.kafka.ConsumerToProducerQueue;
 import org.moshe.arad.kafka.events.NewGameRoomOpenedEvent;
-import org.moshe.arad.kafka.events.NewGameRoomOpenedEventAck;
-import org.moshe.arad.services.LobbyView;
+import org.moshe.arad.view.utils.LobbyView;
+import org.moshe.arad.view.utils.LobbyViewChanges;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +20,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 @Scope("prototype")
 public class NewGameRoomOpenedEventConsumer extends SimpleEventsConsumer {
 
+//	@Autowired
+//	private LobbyViewOld lobbyView;
+	
 	@Autowired
 	private LobbyView lobbyView;
 	
@@ -36,12 +39,16 @@ public class NewGameRoomOpenedEventConsumer extends SimpleEventsConsumer {
 	@Override
 	public void consumerOperations(ConsumerRecord<String, String> record) {
 		NewGameRoomOpenedEvent newGameRoomOpenedEvent = convertJsonBlobIntoEvent(record.value());
+		LobbyViewChanges lobbyViewChanges = context.getBean(LobbyViewChanges.class);
 		
 		try{
 			logger.info("Will add game room...");
 			lobbyView.addGameRoom(newGameRoomOpenedEvent.getGameRoom());
 			lobbyView.addOpenedByUser(newGameRoomOpenedEvent.getGameRoom(), newGameRoomOpenedEvent.getGameRoom().getOpenBy());
 			logger.info("Game room added to view");
+			
+			lobbyViewChanges.getGameRoomsAdd().add(newGameRoomOpenedEvent.getGameRoom());
+			lobbyView.markNeedToUpdateGroupUsers(lobbyViewChanges, "lobby");
 		}
 		catch(Exception e){
 			logger.error("Failed to add new game room to view...");
